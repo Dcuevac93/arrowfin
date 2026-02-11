@@ -4,7 +4,7 @@ import type { PriceLevel } from '../../../lib/types'
 import type { RootState } from '../../store'
 
 type LevelsState = {
-  levelsByPrice: Record<string, PriceLevel | undefined>
+  levelsByPrice: Record<string, PriceLevel | null>
 }
 
 const initialState: LevelsState = {
@@ -23,7 +23,7 @@ export const levelsSlice = createSlice({
 
 export const { upsertLevel } = levelsSlice.actions
 
-export const selectLevelByPrice = (state: RootState, price: number) =>
-  state.levels.levelsByPrice[String(price)]
+export const selectLevelByPrice = (state: RootState, price: number): PriceLevel | null =>
+  state.levels.levelsByPrice[String(price)] ?? null
 
 export default levelsSlice.reducer
