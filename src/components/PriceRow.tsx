@@ -18,12 +18,13 @@ const PriceRow = memo(({ price }: PriceRowProps) => {
   const level = useSelector<RootState, PriceLevel | null>((state) => selectLevelByPrice(state, price))
   const prevPriceRef = useRef<{ bid?: number; ask?: number }>({})
 
-  const flashScheduleTimeout = useRef(null)
-  const flashTimeout = useRef(null)
   const [flash, setFlash] = useState<Flash>({
     bid: null,
     ask: null,
   })
+  
+  const flashScheduleTimeout = useRef(0)
+  const flashTimeout = useRef(0)
 
   useEffect(() => {
     if (!level) return
