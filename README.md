@@ -7,6 +7,10 @@ Small order book (DOM) UI built with React + TypeScript (Vite) and a simple webs
 ### Client
 
 ```bash
+npm i
+```
+
+```bash
 npm run dev
 ```
 
