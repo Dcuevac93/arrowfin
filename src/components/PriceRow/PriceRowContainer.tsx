@@ -1,20 +1,16 @@
 import { memo, useEffect, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
-import { selectLevelByPrice } from '../redux/slices/levels'
-import type { RootState } from '../redux/store'
-import type { PriceLevel } from '../lib/types'
+import { selectLevelByPrice } from '../../redux/slices/levels'
+import type { RootState } from '../../redux/store'
+import type { PriceLevel } from '../../lib/types'
+import PriceRowView from './PriceRowView'
+import type { Flash } from '../../lib/types'
 
-type PriceRowProps = {
+type PriceRowContainerProps = {
   price: number
 }
 
-type Flash = {
-  bid: 'up' | 'down' | null
-  ask: 'up' | 'down' | null
-}
-
-const PriceRow = memo(({ price }: PriceRowProps) => {
-
+const PriceRowContainer = memo(({ price }: PriceRowContainerProps) => {
   const level = useSelector<RootState, PriceLevel | null>((state) => selectLevelByPrice(state, price))
   const prevPriceRef = useRef<{ bid?: number; ask?: number }>({})
 
@@ -22,9 +18,14 @@ const PriceRow = memo(({ price }: PriceRowProps) => {
     bid: null,
     ask: null,
   })
-  
+
   const flashScheduleTimeout = useRef(0)
   const flashTimeout = useRef(0)
+
+  const handleQuickOrder = ({ side }: { side: 'BUY' | 'SELL' }) => {
+    if (!level) return
+    console.log({ type: side === 'BUY' ? 'Buy Limit' : 'Sell Limit', side, price })
+  }
 
   useEffect(() => {
     if (!level) return
@@ -56,33 +57,15 @@ const PriceRow = memo(({ price }: PriceRowProps) => {
   }, [level])
 
   return (
-    <div
-      className="grid grid-cols-[1fr_1fr_1fr] gap-2 px-2 py-1 tabular-nums"
-      role="row"
-    >
-      <div className="text-right font-mono" role="cell">
-        {price.toFixed(2)}
-      </div>
-      <div
-        className={
-          'text-right font-mono text-emerald-400 transition-colors duration-150 ' +
-          (flash.bid === 'up' ? 'bg-emerald-500/25' : flash.bid === 'down' ? 'bg-rose-500/25' : '')
-        }
-        role="cell"
-      >
-        {level?.bidSize ?? ''}
-      </div>
-      <div
-        className={
-          'text-right font-mono text-rose-400 transition-colors duration-150 ' +
-          (flash.ask === 'up' ? 'bg-emerald-500/25' : flash.ask === 'down' ? 'bg-rose-500/25' : '')
-        }
-        role="cell"
-      >
-        {level?.askSize ?? ''}
-      </div>
-    </div>
+    <PriceRowView
+      price={price}
+      bidSize={level?.bidSize ?? null}
+      askSize={level?.askSize ?? null}
+      flash={flash}
+      onBidClick={level ? () => handleQuickOrder({ side: 'BUY' }) : undefined}
+      onAskClick={level ? () => handleQuickOrder({ side: 'SELL' }) : undefined}
+    />
   )
 })
 
-export default PriceRow
+export default PriceRowContainer
