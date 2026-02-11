@@ -1,24 +1,29 @@
-import { memo } from "react"
-import type { PriceLevel } from "../lib/types"
+import { memo } from 'react'
+import { useSelector } from 'react-redux'
+import { selectLevelByPrice } from '../redux/slices/levels'
+import type { RootState } from '../redux/store'
+import type { PriceLevel } from '../lib/types'
 
 type PriceRowProps = {
-  level: PriceLevel
+  price: number
 }
 
-const PriceRow = memo(({ level }: PriceRowProps) => {
+const PriceRow = memo(({ price }: PriceRowProps) => {
+  const level = useSelector<RootState, PriceLevel | undefined>((state) => selectLevelByPrice(state, price))
+
   return (
     <div
       className="grid grid-cols-[1fr_1fr_1fr] gap-2 px-2 py-1 tabular-nums"
-      role="PriceRow"
+      role="row"
     >
       <div className="text-right font-mono" role="cell">
-        {level.price.toFixed(2)}
+        {price.toFixed(2)}
       </div>
       <div className="text-right font-mono text-emerald-400" role="cell">
-        {level.bidSize}
+        {level?.bidSize ?? ''}
       </div>
       <div className="text-right font-mono text-rose-400" role="cell">
-        {level.askSize}
+        {level?.askSize ?? ''}
       </div>
     </div>
   )
